@@ -23,8 +23,11 @@ YUI().add('ellipsis', function (Y) {
     // add this on all Y.Node instances (but only if imported
     Y.DOM.ellipsis = function (node, conf) {
 
+        // homogenize conf to object
+        conf = conf || {};
+
         // augment our conf object with some default settings
-        conf = Y.mix(conf || {}, {
+        Y.mix(conf, {
             // end marker
             'ellipsis' : ' ...',
             
@@ -35,11 +38,15 @@ YUI().add('ellipsis', function (Y) {
             'lines'    : 1
         });
 
+        console.log(conf);
+        console.log(Y.one(node).getComputedStyle('lineHeight'));
+        console.log(Y.one(node).getComputedStyle('fontSize'));
+
             // the element we're trying to truncate
         var yEl           = Y.one(node),
 
             // compute how high the node should be if it's the right number of lines
-            targetHeight  = conf.lines * parseInt(yEl.getComputedStyle('lineHeight')),
+            targetHeight  = conf.lines * (parseInt(yEl.getComputedStyle('lineHeight')) || (parseInt(yEl.getComputedStyle('fontSize')) + 3)),
 
             // original text
             originalText  = yEl.getAttribute('originalText') || yEl.get('text'),
@@ -84,12 +91,12 @@ YUI().add('ellipsis', function (Y) {
         // ok, now that we have a node in the DOM with the right text, measure it's height
         currentHeight = parseInt(clone.getComputedStyle('height'));
 
-        // console.log('currentHeight', currentHeight);
-        // console.log('targetHeight', targetHeight);
+        console.log('currentHeight', currentHeight);
+        console.log('targetHeight', targetHeight);
 
         // quick sanity check
         if (currentHeight <= targetHeight) {
-            // console.log('truncation not necessary!');
+            console.log('truncation not necessary!');
             clone.remove();
             return;
         }
@@ -114,11 +121,11 @@ YUI().add('ellipsis', function (Y) {
                 lastKnownGood = currentLength;
             }
 
-            // console.log('currentLength', currentLength);
-            // console.log('currentHeight', currentHeight);
-            // console.log('targetHeight' , targetHeight );
-            // console.log('charIncrement', charIncrement);
-            // console.log('lastKnownGood', lastKnownGood);
+            console.log('currentLength', currentLength);
+            console.log('currentHeight', currentHeight);
+            console.log('targetHeight' , targetHeight );
+            console.log('charIncrement', charIncrement);
+            console.log('lastKnownGood', lastKnownGood);
 
         }
 

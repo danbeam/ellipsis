@@ -36,6 +36,8 @@
         
         }, conf || {});
 
+        // console.log(conf);
+
         // iterate over all things in the prototype
         return this.each(function () {
 
@@ -43,7 +45,7 @@
             var $el = $(this),
 
                 // compute how high the node should be if it's the right number of lines
-                targetHeight  = conf.lines * parseInt($el.css('line-height')),
+                targetHeight  = conf.lines * (parseInt($el.css('line-height')) || (parseInt($el.css('font-size')) + 3)),
 
                 // original text
                 originalText  = $el.attr('originalText') || $el.text(),
@@ -60,6 +62,9 @@
                 // some current values used to cache .getComputedStyle() accesses and compare to our goals
                 currentHeight;
             
+            // console.log($el.css('line-height'));
+            // console.log($el.css('font-size'));
+
             // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
             // @ NOTE: I'm intentionally ignoring padding as .css('height') @
             // @ NOTE: and .css('width') both ignore this as well (I think) @
