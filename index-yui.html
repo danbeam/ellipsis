@@ -1,0 +1,22 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>YUI Ellipsis plugin demo</head>
+<body>
+<h1>Hello world!</h1>
+<h1>Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world!</h1>
+<script src="http://yui.yahooapis.com/3.2.0/build/yui/yui-min.js"></script>
+<script>
+
+    YUI3 = YUI({
+        'modules' : {
+            'ellipsis' : {
+                'fullpath' : 'yui.ellipsis.js'
+            }
+        }
+    }).use('node', 'ellipsis', function (Y) {
+        Y.all('h1').ellipsis();
+    });
+
+</script>
+</body>
+</html>
