@@ -1,4 +1,24 @@
-(function ($) {
+/**
+* Ellipsis plugin (jQuery) - For when text is too l ...
+*
+* @fileOverview  A slightly smarter way of truncating text
+* @author        Dan Beam <dan@danbeam.org>
+* @param         {object} conf - configuration objects to override the defaults
+* @return        {jQuery} an instance of jQuery with the original nodes
+*
+* Copyright (c) 2010 Dan Beam
+* Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+* THE SOFTWARE.
+*/
+
+; (function ($) {
 
     // add this on all Y.Node instances (but only if imported
     $.fn.ellipsis = function (conf) {
@@ -40,10 +60,10 @@
                 // some current values used to cache .getComputedStyle() accesses and compare to our goals
                 currentHeight;
             
-            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-            // @ NOTE: I'm intentionally ignoring padding as .getComputedStyle('height') @
-            // @ NOTE: and .getComputedStyle('width') both ignore this as well.          @
-            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            // @ NOTE: I'm intentionally ignoring padding as .css('height') @
+            // @ NOTE: and .css('width') both ignore this as well (I think) @
+            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
             // copy styles to clone object
             clone.css({

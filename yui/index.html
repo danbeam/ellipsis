@@ -5,11 +5,11 @@
         <title>YUI3 Ellipsis plugin demo</title>
         <!-- this is not necessary, just nice to have -->
         <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssreset/reset-min.css" media="screen,print" />
-        <link rel="stylesheet" type="text/css" href="ellipsis.css" media="screen,print" />
+        <link rel="stylesheet" type="text/css" href="../ellipsis.css" media="screen,print" />
     </head>
 
     <body>
-        <h1>Ellipsis plugin - for when there's just too much t ...</h1>
+        <h1>Ellipsis plugin (YUI3) - for when there's just too much t ...</h1>
         <div class="single">
             <h2>Single line (<a href="#">do it!</a>)</h2>
             <span>Hello world!</span>
@@ -25,13 +25,17 @@
             <span>Hello world!</span>
             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
+        <div>
+            <h2>Get the source!</h2>
+            <span>If you want to use this plug-in, you can download the source <a href="yui.ellipsis.js">here</a> or the minified version <a href="yui.ellipsis.min.js">here</a>!</span>
+        </div>
         <script type="text/javascript" src="http://yui.yahooapis.com/3.2.0/build/yui/yui-min.js"></script>
         <script type="text/javascript">//<![CDATA[
 
             YUI({
                 'modules' : {
                     'ellipsis' : {
-                        'fullpath' : 'yui.ellipsis.js'
+                        'fullpath' : 'yui.ellipsis.min.js'
                     }
                 }
             }).use('node', 'event', 'windowresize', 'ellipsis', function (Y) {

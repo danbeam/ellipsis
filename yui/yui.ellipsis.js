@@ -1,3 +1,23 @@
+/**
+* Ellipsis plugin (YUI) - For when text is too l ...
+*
+* @fileOverview  A slightly smarter way of truncating text
+* @author        Dan Beam <dan@danbeam.org>
+* @param         {object} conf - configuration objects to override the defaults
+* @return        {Node} the Node passed to the method
+*
+* Copyright (c) 2010 Dan Beam
+* Licensed under the MIT License: http://www.opensource.org/licenses/mit-license.php
+*
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+* IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+* FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+* AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+* LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+* OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+* THE SOFTWARE.
+*/
+
 YUI().add('ellipsis', function (Y) {
 
     // add this on all Y.Node instances (but only if imported
