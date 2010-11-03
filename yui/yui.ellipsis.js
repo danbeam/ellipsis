@@ -18,7 +18,7 @@
 * THE SOFTWARE.
 */
 
-YUI().add('ellipsis', function (Y) {
+YUI.add('ellipsis', function (Y) {
 
     // add this on all Y.Node instances (but only if imported
     Y.DOM.ellipsis = function (node, conf) {
