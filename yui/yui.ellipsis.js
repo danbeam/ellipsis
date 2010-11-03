@@ -38,9 +38,9 @@ YUI().add('ellipsis', function (Y) {
             'lines'    : 1
         });
 
-        console.log(conf);
-        console.log(Y.one(node).getComputedStyle('lineHeight'));
-        console.log(Y.one(node).getComputedStyle('fontSize'));
+        // console.log(conf);
+        // console.log(Y.one(node).getComputedStyle('lineHeight'));
+        // console.log(Y.one(node).getComputedStyle('fontSize'));
 
             // the element we're trying to truncate
         var yEl           = Y.one(node),
@@ -91,12 +91,12 @@ YUI().add('ellipsis', function (Y) {
         // ok, now that we have a node in the DOM with the right text, measure it's height
         currentHeight = parseInt(clone.getComputedStyle('height'));
 
-        console.log('currentHeight', currentHeight);
-        console.log('targetHeight', targetHeight);
+        // console.log('currentHeight', currentHeight);
+        // console.log('targetHeight', targetHeight);
 
         // quick sanity check
         if (currentHeight <= targetHeight) {
-            console.log('truncation not necessary!');
+            // console.log('truncation not necessary!');
             clone.remove();
             return;
         }
@@ -121,11 +121,11 @@ YUI().add('ellipsis', function (Y) {
                 lastKnownGood = currentLength;
             }
 
-            console.log('currentLength', currentLength);
-            console.log('currentHeight', currentHeight);
-            console.log('targetHeight' , targetHeight );
-            console.log('charIncrement', charIncrement);
-            console.log('lastKnownGood', lastKnownGood);
+            // console.log('currentLength', currentLength);
+            // console.log('currentHeight', currentHeight);
+            // console.log('targetHeight' , targetHeight );
+            // console.log('charIncrement', charIncrement);
+            // console.log('lastKnownGood', lastKnownGood);
 
         }
 
