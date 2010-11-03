@@ -45,9 +45,6 @@ YUI.add('ellipsis', function (Y) {
             // the element we're trying to truncate
         var yEl           = Y.one(node),
 
-            // compute how high the node should be if it's the right number of lines
-            targetHeight  = conf.lines * (parseInt(yEl.getComputedStyle('lineHeight')) || (parseInt(yEl.getComputedStyle('fontSize')) + 3)),
-
             // original text
             originalText  = yEl.getAttribute('originalText') || yEl.get('text'),
             
@@ -61,7 +58,7 @@ YUI.add('ellipsis', function (Y) {
             clone = Y.one(document.createElement(yEl.get('nodeName'))),
 
             // some current values used to cache .getComputedStyle() accesses and compare to our goals
-            currentHeight;
+            lineHeight, targetHeight, currentHeight;
 
         // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         // @ NOTE: I'm intentionally ignoring padding as .getComputedStyle('height') @
@@ -70,8 +67,10 @@ YUI.add('ellipsis', function (Y) {
 
         // copy styles to clone object
         clone.setStyles({
+            'overflow'      : 'hidden',   // only at first
             'position'      : 'absolute',
             'visibility'    : 'hidden',
+            'display'       : 'block',
             'bottom'        : '-10px',
             'right'         : '-10px',
             'width'         : yEl.getComputedStyle('width'),
@@ -82,15 +81,28 @@ YUI.add('ellipsis', function (Y) {
             'lineHeight'    : yEl.getComputedStyle('lineHeight')
         });
 
-        // insert the original text, in case we've already truncated
-        clone.set('text', originalText);
+        // insert some text to get the line-height (because .getComputedStyle('lineHeight') can be "normal" sometimes!)
+        clone.set('text', 'some sample text');
 
         // unfortunately, we must insert into the DOM, :(
         Y.one('body').append(clone);
 
+        // get the height of the node with only 1 character of text (should be 1 line)
+        lineHeight    = parseInt(clone.getComputedStyle('height'));
+
+        // set overflow back to visible
+        clone.setStyle('overflow', 'visible');
+
+        // compute how high the node should be if it's the right number of lines
+        targetHeight  = conf.lines * lineHeight;
+
+        // insert the original text, in case we've already truncated
+        clone.set('text', originalText);
+
         // ok, now that we have a node in the DOM with the right text, measure it's height
         currentHeight = parseInt(clone.getComputedStyle('height'));
 
+        // console.log('lineHeight', lineHeight);
         // console.log('currentHeight', currentHeight);
         // console.log('targetHeight', targetHeight);
 

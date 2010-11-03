@@ -44,9 +44,6 @@
                 // the element we're trying to truncate
             var $el = $(this),
 
-                // compute how high the node should be if it's the right number of lines
-                targetHeight  = conf.lines * (parseInt($el.css('line-height')) || (parseInt($el.css('font-size')) + 3)),
-
                 // original text
                 originalText  = $el.attr('originalText') || $el.text(),
                 
@@ -60,7 +57,7 @@
                 clone = $(document.createElement($el[0].nodeName)),
           
                 // some current values used to cache .getComputedStyle() accesses and compare to our goals
-                currentHeight;
+                lineHeight, targetHeight, currentHeight;
             
             // console.log($el.css('line-height'));
             // console.log($el.css('font-size'));
@@ -72,10 +69,12 @@
 
             // copy styles to clone object
             clone.css({
+                'overflow'      : 'hidden',   // just at first
                 'position'      : 'absolute',
                 'visibility'    : 'hidden',
                 'bottom'        : '-10px',
                 'right'         : '-10px',
+                'display'       : 'block',
                 'width'         : $el.css('width'),
                 'fontSize'      : $el.css('font-size'),
                 'fontFamily'    : $el.css('font-family'),
@@ -84,16 +83,28 @@
                 'lineHeight'    : $el.css('line-height')
             });
 
-            // insert original text so we can judge height
-            clone.text(originalText);
+            // insert some sample text to get the line-height
+            clone.text('some sample text');
 
             // unfortunately, we must insert into the DOM, :(
             $('body').append(clone);
 
+            // get the computed height of node when only 1 line
+            lineHeight = clone.height();
+
+            // set overflow back to visible
+            clone.css('overflow', 'visible');
+
+            // compute how high the node should be if it's the right number of lines
+            targetHeight  = conf.lines * lineHeight;
+
+            // insert original text so we can judge height
+            clone.text(originalText);
+
             // get computed height of clone element
             currentHeight = clone.height();
 
-            // console.log('currentLength', currentLength);
+            // console.log('lineHeight', lineHeight);
             // console.log('currentHeight', currentHeight);
             // console.log('targetHeight', targetHeight);
 
