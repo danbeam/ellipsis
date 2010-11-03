@@ -1,22 +1,53 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
-<head><title>YUI Ellipsis plugin demo</head>
-<body>
-<h1>Hello world!</h1>
-<h1>Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world! Hello world!</h1>
-<script src="http://yui.yahooapis.com/3.2.0/build/yui/yui-min.js"></script>
-<script>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <title>YUI3 Ellipsis plugin demo</title>
+        <!-- this is not necessary, just nice to have -->
+        <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/3.2.0/build/cssreset/reset-min.css" media="screen,print" />
+        <link rel="stylesheet" type="text/css" href="ellipsis.css" media="screen,print" />
+    </head>
 
-    YUI3 = YUI({
-        'modules' : {
-            'ellipsis' : {
-                'fullpath' : 'yui.ellipsis.js'
-            }
-        }
-    }).use('node', 'ellipsis', function (Y) {
-        Y.all('h1').ellipsis();
-    });
+    <body>
+        <h1>Ellipsis plugin - for when there's just too much t ...</h1>
+        <div class="single">
+            <h2>Single line (<a href="#">do it!</a>)</h2>
+            <span>Hello world!</span>
+            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
+        </div>
+        <div class="multiple">
+            <h2>Multiple line (<a href="#">do it!</a>)</h2>
+            <span>Hello world!</span>
+            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
+        </div>
+        <div class="resizable">
+            <h2>Resize with window</h2>
+            <span>Hello world!</span>
+            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
+        </div>
+        <script type="text/javascript" src="http://yui.yahooapis.com/3.2.0/build/yui/yui-min.js"></script>
+        <script type="text/javascript">//<![CDATA[
 
-</script>
-</body>
+            YUI({
+                'modules' : {
+                    'ellipsis' : {
+                        'fullpath' : 'yui.ellipsis.js'
+                    }
+                }
+            }).use('node', 'event', 'windowresize', 'ellipsis', function (Y) {
+                Y.all('.single a').on('click', function (e) {
+                    e.target.get('parentNode').siblings().ellipsis();
+                    e.preventDefault();
+                });
+                Y.all('.multiple a').on('click', function (e) {
+                    e.target.get('parentNode').siblings().ellipsis({lines:2});
+                    e.preventDefault();
+                });
+                Y.on('windowresize', function () {
+                    Y.all('.resizable span').ellipsis();
+                });
+            });
+
+        //]]></script>
+    </body>
 </html>

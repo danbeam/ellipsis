@@ -1,0 +1,30 @@
+body {
+    margin: 20px;
+}
+
+h1, h2, a, span { 
+    font-family: helvetica, "trebuchet ms", arial, verdana, sans-serif;
+}
+
+h1 {
+    font-size: 46px;
+    margin-bottom: 15px;
+}
+
+h2 {
+    font-size: 36px;
+    padding: 5px;
+    margin: -10px -10px 10px -10px;
+    border-bottom: 2px solid #d0d0d0;
+    background: #e0e0e0;
+}   
+
+span {
+    display: block;
+}   
+
+div {
+    border: 2px solid #c0c0c0;
+    padding: 10px;
+    margin-bottom: 25px;
+}

@@ -22,7 +22,7 @@ YUI().add('ellipsis', function (Y) {
             targetHeight  = conf.lines * parseInt(yEl.getComputedStyle('lineHeight')),
 
             // original text
-            originalText  = yEl.get('text'),
+            originalText  = yEl.getAttribute('originalText') || yEl.get('text'),
             
             // keep the current length of the text so far
             currentLength = originalText.length,
@@ -30,21 +30,12 @@ YUI().add('ellipsis', function (Y) {
             // the number of characters to increment or decrement the text by
             charIncrement = currentLength,
       
-            // some current values used to cache .getComputedStyle() accesses and compare to our goals
-            currentHeight = parseInt(yEl.getComputedStyle('height'));
-
-        // console.log('currentHeight', currentHeight);
-        // console.log('targetHeight', targetHeight);
-
-        // quick sanity check
-        if (currentHeight <= targetHeight) {
-            // console.log('silly you!');
-            return;
-        }
-        
             // copy the element so we can string length invisibly
-        var clone = Y.one(document.createElement(yEl.get('nodeName')));
-        
+            clone = Y.one(document.createElement(yEl.get('nodeName'))),
+
+            // some current values used to cache .getComputedStyle() accesses and compare to our goals
+            currentHeight;
+
         // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         // @ NOTE: I'm intentionally ignoring padding as .getComputedStyle('height') @
         // @ NOTE: and .getComputedStyle('width') both ignore this as well.          @
@@ -64,8 +55,24 @@ YUI().add('ellipsis', function (Y) {
             'lineHeight'    : yEl.getComputedStyle('lineHeight')
         });
 
+        // insert the original text, in case we've already truncated
+        clone.set('text', originalText);
+
         // unfortunately, we must insert into the DOM, :(
         Y.one('body').append(clone);
+
+        // ok, now that we have a node in the DOM with the right text, measure it's height
+        currentHeight = parseInt(clone.getComputedStyle('height'));
+
+        // console.log('currentHeight', currentHeight);
+        // console.log('targetHeight', targetHeight);
+
+        // quick sanity check
+        if (currentHeight <= targetHeight) {
+            // console.log('truncation not necessary!');
+            clone.remove();
+            return;
+        }
 
         // now, let's start looping through and slicing the text as necessary
         for (var lastKnownGood; charIncrement >= 1;) {
@@ -98,6 +105,11 @@ YUI().add('ellipsis', function (Y) {
         // remove from DOM
         clone.remove();
         
+        // set the original text if we want to ever want to expand past the current truncation
+        if (!yEl.getAttribute('originalText')) {
+            yEl.setAttribute('originalText', originalText);
+        }
+
         // do this thing, already!
         yEl.set('text', originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
 

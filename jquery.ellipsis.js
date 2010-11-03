@@ -20,35 +20,25 @@
         return this.each(function () {
 
                 // the element we're trying to truncate
-            var $el = $(this);
+            var $el = $(this),
 
                 // compute how high the node should be if it's the right number of lines
                 targetHeight  = conf.lines * parseInt($el.css('line-height')),
 
                 // original text
-                originalText  = $el.text(),
+                originalText  = $el.attr('originalText') || $el.text(),
                 
                 // keep the current length of the text so far
                 currentLength = originalText.length,
                 
                 // the number of characters to increment or decrement the text by
                 charIncrement = currentLength,
+
+                // copy the element so we can string length invisibly
+                clone = $(document.createElement($el[0].nodeName)),
           
                 // some current values used to cache .getComputedStyle() accesses and compare to our goals
-                currentHeight = $el.height();
-
-            // console.log('currentLength', currentLength);
-            // console.log('currentHeight', currentHeight);
-            // console.log('targetHeight', targetHeight);
-
-            // quick sanity check
-            if (currentHeight <= targetHeight) {
-                // console.log('silly you!');
-                return;
-            }
-            
-                // copy the element so we can string length invisibly
-            var clone = $(document.createElement($el[0].nodeName));
+                currentHeight;
             
             // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
             // @ NOTE: I'm intentionally ignoring padding as .getComputedStyle('height') @
@@ -69,9 +59,26 @@
                 'lineHeight'    : $el.css('line-height')
             });
 
+            // insert original text so we can judge height
+            clone.text(originalText);
+
             // unfortunately, we must insert into the DOM, :(
             $('body').append(clone);
 
+            // get computed height of clone element
+            currentHeight = clone.height();
+
+            // console.log('currentLength', currentLength);
+            // console.log('currentHeight', currentHeight);
+            // console.log('targetHeight', targetHeight);
+
+            // quick sanity check
+            if (currentHeight <= targetHeight) {
+                // console.log('no wrapping necessary!');
+                clone.remove();
+                return;
+            }
+            
             // now, let's start looping through and slicing the text as necessary
             for (var lastKnownGood; charIncrement >= 1;) {
 
@@ -103,6 +110,11 @@
             // remove from DOM
             clone.remove();
             
+            // remember the original text before it's munged
+            if (!$el.attr('originalText')) {
+                $el.attr('originalText', originalText);
+            }
+
             // do this thing, already!
             $el.text(originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
 
