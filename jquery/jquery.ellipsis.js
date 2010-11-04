@@ -29,7 +29,7 @@
             'ellipsis' : ' ...',
                 
             // for stuff we *really* don't want to wrap, increase this number just in case
-            'fudge'    : 0,
+            'fudge'    : 3,
 
             // target number of lines to wrap
             'lines'    : 1
