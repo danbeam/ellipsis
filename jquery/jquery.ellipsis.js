@@ -107,9 +107,11 @@
             // console.log('lineHeight', lineHeight);
             // console.log('currentHeight', currentHeight);
             // console.log('targetHeight', targetHeight);
+            // console.log('originalText.length', originalText.length);
+            // console.log('clone.text().length', clone.text().length);
 
             // quick sanity check
-            if (currentHeight <= targetHeight) {
+            if (currentHeight <= targetHeight && originalText.length === $el.text().length) {
                 // console.log('no wrapping necessary!');
                 clone.remove();
                 return;
@@ -151,8 +153,17 @@
                 $el.attr('originalText', originalText);
             }
 
-            // do this thing, already!
-            $el.text(originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
+            // if the text matches
+            if (originalText.length === (clone.text().length - conf.ellipsis.length)) {
+                // this means we *de-truncated* and can fit fully in the new space
+                // console.log('de-truncated!');
+                $el.text(originalText);
+            }
+            // this should NEVER happen, but doesn't hurt to check...
+            else if ('undefined' !== typeof lastKnownGood) {
+                // do this thing, already!
+                $el.text(originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
+            }
 
         });
 

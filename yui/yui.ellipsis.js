@@ -105,9 +105,11 @@ YUI.add('ellipsis', function (Y) {
         // console.log('lineHeight', lineHeight);
         // console.log('currentHeight', currentHeight);
         // console.log('targetHeight', targetHeight);
+        // console.log('originalText.length', originalText.length);
+        // console.log('yEl.get(\'text\').length', yEl.get('text').length);
 
         // quick sanity check
-        if (currentHeight <= targetHeight) {
+        if (currentHeight <= targetHeight && originalText.length === yEl.get('text').length) {
             // console.log('truncation not necessary!');
             clone.remove();
             return;
@@ -149,8 +151,21 @@ YUI.add('ellipsis', function (Y) {
             yEl.setAttribute('originalText', originalText);
         }
 
-        // do this thing, already!
-        yEl.set('text', originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
+        // console.log('originalText.length', originalText.length);
+        // console.log('clone.get(\'text\').length', clone.get('text').length);
+        // console.log('conf.ellipsis.length', conf.ellipsis.length);
+
+        // if the text matches
+        if (originalText.length === (clone.get('text').length - conf.ellipsis.length)) {
+            // this means we *de-truncated* and can fit fully in the new space
+            // console.log('de-truncated!');
+            yEl.set('text', originalText);
+        }
+        // this should never happen, but it doesn't hurt to check
+        else if ('undefined' !== typeof lastKnownGood) {
+            // do this thing, already!
+            yEl.set('text', originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
+        }
 
         // return myself for chainability
         return yEl;
