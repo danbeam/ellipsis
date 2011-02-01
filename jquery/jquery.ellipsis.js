@@ -18,7 +18,15 @@
 * THE SOFTWARE.
 */
 
-; (function ($) {
+(function ($) {
+
+        // the allowable difference when comparing floating point numbers
+    var fp_epsilon    = 0.01,
+
+        // floating point comparison
+        fp_equals     = function (a, b) { return Math.abs(a - b) <= fp_epsilon; },
+        fp_greater    = function (a, b) { return a - b >= fp_epsilon; },
+        fp_lesser     = function (a, b) { return a - b <= fp_epsilon; };
 
     // add this on all Y.Node instances (but only if imported
     $.fn.ellipsis = function (conf) {
@@ -29,7 +37,7 @@
             'ellipsis' : ' ...',
                 
             // for stuff we *really* don't want to wrap, increase this number just in case
-            'fudge'    : 3,
+            'fudge'    : 1,
 
             // target number of lines to wrap
             'lines'    : 1
@@ -38,7 +46,7 @@
 
         // console.log(conf);
 
-        // iterate over all things in the prototype
+        // iterate over all things in our collection
         return this.each(function () {
 
                 // the element we're trying to truncate
@@ -54,10 +62,10 @@
                 charIncrement = currentLength,
 
                 // copy the element so we can string length invisibly
-                clone = $(document.createElement($el[0].nodeName)),
+                $clone = $(document.createElement($el[0].nodeName)),
           
                 // some current values used to cache .getComputedStyle() accesses and compare to our goals
-                lineHeight, targetHeight, currentHeight;
+                lineHeight, targetHeight, currentHeight, lastKnownGood;
             
             // console.log($el.css('line-height'));
             // console.log($el.css('font-size'));
@@ -67,8 +75,8 @@
             // @ NOTE: and .css('width') both ignore this as well (I think) @
             // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-            // copy styles to clone object
-            clone.css({
+            // copy styles to $clone object
+            $clone.css({
                 'overflow'      : 'hidden',   // just at first
                 'position'      : 'absolute',
                 'visibility'    : 'hidden',
@@ -80,60 +88,59 @@
                 'fontFamily'    : $el.css('font-family'),
                 'fontWeight'    : $el.css('font-weight'),
                 'letterSpacing' : $el.css('letter-spacing'),
-                'lineHeight'    : $el.css('line-height')
             });
 
             // insert some sample text to get the line-height
-            clone.text('some sample text');
+            $clone.text('some sample text');
 
             // unfortunately, we must insert into the DOM, :(
-            $('body').append(clone);
+            $('body').append($clone);
 
             // get the computed height of node when only 1 line
-            lineHeight = clone.height();
+            lineHeight = $clone.height();
 
             // set overflow back to visible
-            clone.css('overflow', 'visible');
+            $clone.css('overflow', 'visible');
 
             // compute how high the node should be if it's the right number of lines
             targetHeight  = conf.lines * lineHeight;
 
             // insert original text so we can judge height
-            clone.text(originalText);
+            $clone.text(originalText);
 
-            // get computed height of clone element
-            currentHeight = clone.height();
+            // get computed height of $clone element
+            currentHeight = $clone.height();
 
             // console.log('lineHeight', lineHeight);
             // console.log('currentHeight', currentHeight);
             // console.log('targetHeight', targetHeight);
             // console.log('originalText.length', originalText.length);
-            // console.log('clone.text().length', clone.text().length);
+            // console.log('$clone.text().length', $clone.text().length);
 
             // quick sanity check
-            if (currentHeight <= targetHeight && originalText.length === $el.text().length) {
+            if ((fp_lesser(currentHeight, targetHeight) || fp_equals(currentHeight, targetHeight)) && originalText.length === $el.text().length) {
                 // console.log('no wrapping necessary!');
-                clone.remove();
+                $clone.remove();
                 return;
             }
             
             // now, let's start looping through and slicing the text as necessary
-            for (var lastKnownGood; charIncrement >= 1;) {
+            for (; charIncrement >= 1; ) {
 
                 // increment decays by half every time 
                 charIncrement = Math.floor(charIncrement / 2);
 
                 // if the height is too big, remove some chars, else add some
-                currentLength += currentHeight > targetHeight ? -charIncrement : +charIncrement;
+                currentLength += fp_greater(currentHeight, targetHeight) ? -charIncrement : +charIncrement;
                 
                 // try text at current length
-                clone.text(originalText.slice(0, currentLength - conf.ellipsis.length) + conf.ellipsis);
+                $clone.text(originalText.slice(0, currentLength - conf.ellipsis.length) + conf.ellipsis);
                 
                 // compute the current height
-                currentHeight = clone.height();
+                currentHeight = $clone.height();
 
                 // we only want to store values that aren't too big
-                if (currentHeight <= targetHeight) {
+                if (fp_lesser(currentHeight, targetHeight) || fp_equals(currentHeight, targetHeight)) {
                     lastKnownGood = currentLength;
                 }
 
@@ -146,7 +153,7 @@
             }
 
             // remove from DOM
-            clone.remove();
+            $clone.remove();
             
             // remember the original text before it's munged
             if (!$el.attr('originalText')) {
@@ -154,7 +161,7 @@
             }
 
             // if the text matches
-            if (originalText.length === (clone.text().length - conf.ellipsis.length)) {
+            if (originalText.length === ($clone.text().length - conf.ellipsis.length)) {
                 // this means we *de-truncated* and can fit fully in the new space
                 // console.log('de-truncated!');
                 $el.text(originalText);
@@ -169,4 +176,4 @@
 
     };
 
-})(jQuery)
+})(jQuery);

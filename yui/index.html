@@ -18,7 +18,7 @@
         <div class="multiple">
             <h2>Multiple line (<a href="#">do it!</a>)</h2>
             <span>Hello world!</span>
-            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
+            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
         <div class="resizable">
             <h2>Resize with window</h2>
@@ -44,7 +44,7 @@
                     e.preventDefault();
                 });
                 Y.all('.multiple a').on('click', function (e) {
-                    e.target.get('parentNode').siblings().ellipsis({lines:2});
+                    e.target.get('parentNode').siblings().ellipsis({lines:3});
                     e.preventDefault();
                 });
                 Y.on('windowresize', function () {

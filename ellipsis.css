@@ -1,5 +1,6 @@
 body {
     margin: 20px;
+    font-size: 13px;
 }
 
 h1, h2, a, span { 
@@ -21,6 +22,7 @@ h2 {
 
 span {
     display: block;
+    font-size: 90%;
 }   
 
 div {
