@@ -17,6 +17,7 @@
 * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 * THE SOFTWARE.
 */
+
 YUI.add('ellipsis', function (Y) {
 
     // add this on all Y.Node instances (but only if imported
@@ -31,20 +32,27 @@ YUI.add('ellipsis', function (Y) {
             'ellipsis' : ' ...',
             
             // for stuff we *really* don't want to wrap, increase this number just in case
-            'fudge'    : 1,
+            'fudge'    : 3,
 
             // target number of lines to wrap
-            'lines'    : 1
+            'lines'    : 1,
+
+            // whether or not to remember the original text to able to de-truncate
+            'remember' : true
         });
 
-        // console.log('conf', conf);
-        // console.log('fontSize', Y.one(node).getComputedStyle('fontSize'));
+        // console.log(conf);
+        // console.log(Y.one(node).getComputedStyle('lineHeight'));
+        // console.log(Y.one(node).getComputedStyle('fontSize'));
 
             // the element we're trying to truncate
         var yEl           = Y.one(node),
 
+            // the name of the field we use to store using .setData()
+            dataAttrName  = 'ellipsis-original-text',
+
             // original text
-            originalText  = yEl.getAttribute('originalText') || yEl.get('text'),
+            originalText  = conf.remember && yEl.getData(dataAttrName) || yEl.get('text'),
             
             // keep the current length of the text so far
             currentLength = originalText.length,
@@ -84,9 +92,10 @@ YUI.add('ellipsis', function (Y) {
             'fontFamily'    : yEl.getComputedStyle('fontFamily'),
             'fontWeight'    : yEl.getComputedStyle('fontWeight'),
             'letterSpacing' : yEl.getComputedStyle('letterSpacing'),
+            'lineHeight'    : yEl.getComputedStyle('lineHeight')
         });
 
-        // insert some text to get the line-height
+        // insert some text to get the line-height (because .getComputedStyle('lineHeight') can be "normal" sometimes!)
         clone.set('text', 'some sample text');
 
         // unfortunately, we must insert into the DOM, :(
@@ -114,7 +123,7 @@ YUI.add('ellipsis', function (Y) {
         // console.log('yEl.get(\'text\').length', yEl.get('text').length);
 
         // quick sanity check
-        if ((fp_lesser(currentHeight, targetHeight) || fp_equals(currentHeight, targetHeight)) && originalText.length === yEl.get('text').length) {
+        if (fp_lesser(currentHeight, targetHeight) && originalText.length === yEl.get('text').length) {
             // console.log('truncation not necessary!');
             clone.remove();
             return;
@@ -140,7 +149,11 @@ YUI.add('ellipsis', function (Y) {
                 lastKnownGood = currentLength;
             }
 
-            // console.log('current', currentHeight, 'target' , targetHeight, 'good', lastKnownGood);
+            // console.log('currentLength', currentLength);
+            // console.log('currentHeight', currentHeight);
+            // console.log('targetHeight' , targetHeight );
+            // console.log('charIncrement', charIncrement);
+            // console.log('lastKnownGood', lastKnownGood);
 
         }
 
@@ -148,8 +161,8 @@ YUI.add('ellipsis', function (Y) {
         clone.remove();
         
         // set the original text if we want to ever want to expand past the current truncation
-        if (!yEl.getAttribute('originalText')) {
-            yEl.setAttribute('originalText', originalText);
+        if (conf.remember && !yEl.getData(dataAttrName)) {
+            yEl.setData(dataAttrName, originalText);
         }
 
         // console.log('originalText.length', originalText.length);
@@ -175,6 +188,7 @@ YUI.add('ellipsis', function (Y) {
 
     Y.Node.importMethod(Y.DOM, 'ellipsis');
     Y.NodeList.importMethod(Y.Node.prototype, 'ellipsis');
+
 
 },
 

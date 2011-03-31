@@ -37,11 +37,13 @@
             'ellipsis' : ' ...',
                 
             // for stuff we *really* don't want to wrap, increase this number just in case
-            'fudge'    : 1,
+            'fudge'    : 3,
 
             // target number of lines to wrap
-            'lines'    : 1
-        
+            'lines'    : 1,
+
+            // whether or not to remember the original text to able to de-truncate
+            'remember' : true
         }, conf || {});
 
         // console.log(conf);
@@ -52,9 +54,12 @@
                 // the element we're trying to truncate
             var $el = $(this),
 
+                // the name of the field we use to store .data() in
+                dataAttrName  = 'ellipsis-original-text',
+
                 // original text
-                originalText  = $el.attr('originalText') || $el.text(),
-                
+                originalText  = conf.remember && $el.data(dataAttrName) || $el.text(),
+
                 // keep the current length of the text so far
                 currentLength = originalText.length,
                 
@@ -156,8 +161,8 @@
             $clone.remove();
             
             // remember the original text before it's munged
-            if (!$el.attr('originalText')) {
-                $el.attr('originalText', originalText);
+            if (conf.remember && !$el.data(dataAttrName)) {
+                $el.data(dataAttrName, originalText);
             }
 
             // if the text matches
