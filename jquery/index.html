@@ -58,7 +58,7 @@
                     $('.resizable span').ellipsis();
                 }
                 else {
-                    $('.resizable span').ellipsis({'native':false});
+                    window.onload = function () { $('.resizable span').ellipsis({'native':false}); }; // wtf? do I have to do this?!
                     $(window).resize(function () {
                         $('.resizable span').ellipsis({'native':false});
                     });
