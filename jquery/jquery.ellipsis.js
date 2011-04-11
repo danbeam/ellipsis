@@ -21,164 +21,230 @@
 (function ($) {
 
         // the allowable difference when comparing floating point numbers
-    var fp_epsilon    = 0.01,
+    var fp_epsilon  = 0.01,
 
         // floating point comparison
-        fp_equals     = function (a, b) { return Math.abs(a - b) <= fp_epsilon; },
-        fp_greater    = function (a, b) { return a - b >= fp_epsilon; },
-        fp_lesser     = function (a, b) { return a - b <= fp_epsilon; };
+        fp_equals   = function (a, b) { return Math.abs(a - b) <= fp_epsilon; },
+        fp_greater  = function (a, b) { return a - b >= fp_epsilon; },
+        fp_lesser   = function (a, b) { return a - b <= fp_epsilon; },
 
+        // the name of the field we use to store .data() in
+        dataKey     = 'ellipsis-original-text',
+
+        // this is populated later if native support is available
+        nativeRule  = false;
+        
     // add this on all Y.Node instances (but only if imported
     $.fn.ellipsis = function (conf) {
 
         // augment our conf object with some default settings
         conf = $.extend({
             // end marker
-            'ellipsis' : ' ...',
+            'ellipsis' : '\u2026',
                 
             // for stuff we *really* don't want to wrap, increase this number just in case
-            'fudge'    : 3,
+            'fudge'    : 0,
 
             // target number of lines to wrap
             'lines'    : 1,
 
             // whether or not to remember the original text to able to de-truncate
-            'remember' : true
+            'remember' : true,
+
+            // should we use native browser support when it exists? (on by default)
+            'native'   : true
         }, conf || {});
 
         // console.log(conf);
 
-        // iterate over all things in our collection
-        return this.each(function () {
+        // quick case - if we have native support and the stars align
+        if (nativeRule && conf['native'] && conf.lines == 1 && conf.ellipsis === '\u2026') {
 
-                // the element we're trying to truncate
-            var $el = $(this),
+            // if these styles are already set, resetting them isn't that big of a deal (performance wise)
+            var nativeStyles = {
+                'white-space'       : 'nowrap',
+                'overflow'          : 'hidden'
+            };
 
-                // the name of the field we use to store .data() in
-                dataAttrName  = 'ellipsis-original-text',
+            // also add the native rule to the mix
+            nativeStyles[nativeRule] = 'ellipsis';
 
-                // original text
-                originalText  = conf.remember && $el.data(dataAttrName) || $el.text(),
-
-                // keep the current length of the text so far
-                currentLength = originalText.length,
-                
-                // the number of characters to increment or decrement the text by
-                charIncrement = currentLength,
-
-                // copy the element so we can string length invisibly
-                $clone = $(document.createElement($el[0].nodeName)),
-          
-                // some current values used to cache .getComputedStyle() accesses and compare to our goals
-                lineHeight, targetHeight, currentHeight, lastKnownGood;
-            
-            // console.log($el.css('line-height'));
-            // console.log($el.css('font-size'));
-
-            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-            // @ NOTE: I'm intentionally ignoring padding as .css('height') @
-            // @ NOTE: and .css('width') both ignore this as well (I think) @
-            // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-            // copy styles to $clone object
-            $clone.css({
-                'overflow'      : 'hidden',   // just at first
-                'position'      : 'absolute',
-                'visibility'    : 'hidden',
-                'bottom'        : '-10px',
-                'right'         : '-10px',
-                'display'       : 'block',
-                'width'         : $el.css('width'),
-                'fontSize'      : $el.css('font-size'),
-                'fontFamily'    : $el.css('font-family'),
-                'fontWeight'    : $el.css('font-weight'),
-                'letterSpacing' : $el.css('letter-spacing'),
+            // set all the styles and terminate early by returning the set
+            return this.each(function () {
+                $(this).css(nativeStyles);
             });
 
-            // insert some sample text to get the line-height
-            $clone.text('some sample text');
+        }
+        // no native support or the wrong kind of arguments
+        else {
 
-            // unfortunately, we must insert into the DOM, :(
-            $('body').append($clone);
+            // iterate over all things in our collection
+            return this.each(function () {
 
-            // get the computed height of node when only 1 line
-            lineHeight = $clone.height();
+                    // the element we're trying to truncate
+                var $el = $(this),
 
-            // set overflow back to visible
-            $clone.css('overflow', 'visible');
+                    // original text
+                    originalText  = conf.remember && $el.data(dataKey) || $el.text(),
 
-            // compute how high the node should be if it's the right number of lines
-            targetHeight  = conf.lines * lineHeight;
+                    // keep the current length of the text so far
+                    currentLength = originalText.length,
+                    
+                    // the number of characters to increment or decrement the text by
+                    charIncrement = currentLength,
 
-            // insert original text so we can judge height
-            $clone.text(originalText);
+                    // copy the element so we can string length invisibly
+                    $clone = $(document.createElement($el[0].nodeName)),
+              
+                    // some current values used to cache .getComputedStyle() accesses and compare to our goals
+                    lineHeight, targetHeight, currentHeight, lastKnownGood;
 
-            // get computed height of $clone element
-            currentHeight = $clone.height();
+                // console.log($el.css('line-height'));
+                // console.log($el.css('font-size'));
 
-            // console.log('lineHeight', lineHeight);
-            // console.log('currentHeight', currentHeight);
-            // console.log('targetHeight', targetHeight);
-            // console.log('originalText.length', originalText.length);
-            // console.log('$clone.text().length', $clone.text().length);
+                // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+                // @ NOTE: I'm intentionally ignoring padding as .css('height') @
+                // @ NOTE: and .css('width') both ignore this as well (I think) @
+                // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-            // quick sanity check
-            if ((fp_lesser(currentHeight, targetHeight) || fp_equals(currentHeight, targetHeight)) && originalText.length === $el.text().length) {
-                // console.log('no wrapping necessary!');
-                $clone.remove();
-                return;
-            }
-            
-            // now, let's start looping through and slicing the text as necessary
-            for (; charIncrement >= 1; ) {
+                // copy styles to $clone object
+                $clone.css({
+                    'overflow'      : 'hidden',   // just at first
+                    'position'      : 'absolute',
+                    'visibility'    : 'hidden',
+                    'bottom'        : '-10px',
+                    'right'         : '-10px',
+                    'display'       : 'block',
+                    'width'         : $el.css('width'),
+                    'fontSize'      : $el.css('font-size'),
+                    'fontFamily'    : $el.css('font-family'),
+                    'fontWeight'    : $el.css('font-weight'),
+                    'letterSpacing' : $el.css('letter-spacing'),
+                });
 
-                // increment decays by half every time 
-                charIncrement = Math.floor(charIncrement / 2);
+                // insert some sample text to get the line-height
+                $clone.text('s');
 
-                // if the height is too big, remove some chars, else add some
-                currentLength += fp_greater(currentHeight, targetHeight) ? -charIncrement : +charIncrement;
-                
-                // try text at current length
-                $clone.text(originalText.slice(0, currentLength - conf.ellipsis.length) + conf.ellipsis);
-                
-                // compute the current height
+                // unfortunately, we must insert into the DOM, :(
+                $('body').append($clone);
+
+                // get the computed height of node when only 1 line
+                lineHeight = $clone.height();
+
+                // set overflow back to visible
+                $clone.css('overflow', 'visible');
+
+                // compute how high the node should be if it's the right number of lines
+                targetHeight  = conf.lines * lineHeight;
+
+                // insert original text so we can judge height
+                $clone.text(originalText);
+
+                // get computed height of $clone element
                 currentHeight = $clone.height();
 
-                // we only want to store values that aren't too big
-                if (fp_lesser(currentHeight, targetHeight) || fp_equals(currentHeight, targetHeight)) {
-                    lastKnownGood = currentLength;
+                // console.log('lineHeight', lineHeight);
+                // console.log('currentHeight', currentHeight);
+                // console.log('targetHeight', targetHeight);
+                // console.log('originalText.length', originalText.length);
+                // console.log('$clone.text().length', $clone.text().length);
+
+                // quick sanity check
+                if ((fp_lesser(currentHeight, targetHeight) || fp_equals(currentHeight, targetHeight)) && originalText.length === $el.text().length) {
+                    // console.log('no wrapping necessary!');
+                    $clone.remove();
+                    return;
+                }
+                
+                // now, let's start looping through and slicing the text as necessary
+                for (; charIncrement >= 1; ) {
+
+                    // increment decays by half every time 
+                    charIncrement = Math.floor(charIncrement / 2);
+
+                    // if the height is too big, remove some chars, else add some
+                    currentLength += fp_greater(currentHeight, targetHeight) ? -charIncrement : +charIncrement;
+                    
+                    // try text at current length
+                    $clone.text(originalText.slice(0, currentLength - conf.ellipsis.length) + conf.ellipsis);
+                    
+                    // compute the current height
+                    currentHeight = $clone.height();
+
+                    // we only want to store values that aren't too big
+                    if (fp_lesser(currentHeight, targetHeight) || fp_equals(currentHeight, targetHeight)) {
+                        lastKnownGood = currentLength;
+                    }
+
+                    // console.log('currentLength', currentLength);
+                    // console.log('currentHeight', currentHeight);
+                    // console.log('targetHeight' , targetHeight );
+                    // console.log('charIncrement', charIncrement);
+                    // console.log('lastKnownGood', lastKnownGood);
+
                 }
 
-                // console.log('currentLength', currentLength);
-                // console.log('currentHeight', currentHeight);
-                // console.log('targetHeight' , targetHeight );
-                // console.log('charIncrement', charIncrement);
-                // console.log('lastKnownGood', lastKnownGood);
+                // remove from DOM
+                $clone.remove();
+                
+                // remember the original text before it's munged
+                if (conf.remember && !$el.data(dataKey)) {
+                    $el.data(dataKey, originalText);
+                }
 
-            }
+                // if the text matches
+                if (originalText.length === ($clone.text().length - conf.ellipsis.length)) {
+                    // this means we *de-truncated* and can fit fully in the new space
+                    // console.log('de-truncated!');
+                    $el.text(originalText);
+                }
+                // this should NEVER happen, but doesn't hurt to check...
+                else if ('undefined' !== typeof lastKnownGood) {
+                    // do this thing, already!
+                    $el.text(originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
+                }
 
-            // remove from DOM
-            $clone.remove();
-            
-            // remember the original text before it's munged
-            if (conf.remember && !$el.data(dataAttrName)) {
-                $el.data(dataAttrName, originalText);
-            }
+            });
 
-            // if the text matches
-            if (originalText.length === ($clone.text().length - conf.ellipsis.length)) {
-                // this means we *de-truncated* and can fit fully in the new space
-                // console.log('de-truncated!');
-                $el.text(originalText);
-            }
-            // this should NEVER happen, but doesn't hurt to check...
-            else if ('undefined' !== typeof lastKnownGood) {
-                // do this thing, already!
-                $el.text(originalText.slice(0, lastKnownGood - conf.ellipsis.length - conf.fudge) + conf.ellipsis);
-            }
+        };
 
+    }
+
+    // do a quick feature test to see if we're natively supported
+    $(function () {
+
+        // a hidden node we're testing
+        var hidden      = $('<div style="visibility:hidden;position:absolute;white-space:nowrap;overflow:hidden;"></div>'),
+
+            // give any possible rules that would give native support (omit -ms-text-overflow - does the same thing)
+            nativeRules = ['textOverflow', 'OTextOverflow'];
+
+        // add each of the prospective native rules
+        $(nativeRules).each(function (i, rule) {
+            hidden.css(rule, 'ellipsis');
         });
 
-    };
+        // add to <body> when DOM is ready
+        $('body').append(hidden);
+
+        // deep clone the node (include attributes)
+        var cloned = hidden.clone(true);
+
+        // check to see which survived
+        $(nativeRules).each(function (i, rule) {
+            if ('ellipsis' === $(cloned).css(rule)) {
+                nativeRule = rule;
+                return false;
+            }
+        });
+
+        // expose a support variable
+        $.fn.ellipsis.nativeSupport = !!nativeRule;
+
+        // clean-up
+        hidden.remove();
+        cloned = hidden = null;
+
+    });
 
 })(jQuery);

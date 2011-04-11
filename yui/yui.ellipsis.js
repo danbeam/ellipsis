@@ -20,6 +20,17 @@
 
 YUI.add('ellipsis', function (Y) {
 
+    var // the allowable difference when comparing floating point numbers
+        fp_epsilon  = 0.01,
+
+        // floating point comparison
+        fp_equals   = function (a, b) { return Math.abs(a - b) <= fp_epsilon; },
+        fp_greater  = function (a, b) { return a - b >= fp_epsilon; },
+        fp_lesser   = function (a, b) { return a - b <= fp_epsilon; },
+
+        // do a quick feature test to see if native text-overflow: ellipsis is supported
+        nativeRule  = false;
+
     // add this on all Y.Node instances (but only if imported
     Y.DOM.ellipsis = function (node, conf) {
 
@@ -29,7 +40,7 @@ YUI.add('ellipsis', function (Y) {
         // augment our conf object with some default settings
         Y.mix(conf, {
             // end marker
-            'ellipsis' : ' ...',
+            'ellipsis' : '\u2026',
             
             // for stuff we *really* don't want to wrap, increase this number just in case
             'fudge'    : 3,
@@ -38,12 +49,34 @@ YUI.add('ellipsis', function (Y) {
             'lines'    : 1,
 
             // whether or not to remember the original text to able to de-truncate
-            'remember' : true
+            'remember' : true,
+
+            // should we use native browser support when it exists? (on by default)
+            'native'   : true
         });
 
         // console.log(conf);
         // console.log(Y.one(node).getComputedStyle('lineHeight'));
         // console.log(Y.one(node).getComputedStyle('fontSize'));
+
+        // if we have the native support for text-overflow and we only want 1 line with the same style ellipsis
+        if (Y.DOM.ellipsis.nativeSupport && conf['native'] && 1 == conf.lines && '\u2026' === conf.ellipsis) {
+
+            // just use the native by setting this CSS
+            var nativeStyles = {
+                'white-space'   : 'nowrap',
+                'overflow'      : 'hidden'
+            };
+
+            // set the native rule as well
+            nativeStyles[nativeRule] = 'ellipsis';
+
+            // apply the styles
+            Y.one(node).setStyles(nativeStyles);
+
+            return; // exit early
+
+        }
 
             // the element we're trying to truncate
         var yEl           = Y.one(node),
@@ -62,14 +95,6 @@ YUI.add('ellipsis', function (Y) {
       
             // copy the element so we can string length invisibly
             clone         = Y.one(document.createElement(yEl.get('nodeName'))),
-
-            // the allowable difference when comparing floating point numbers
-            fp_epsilon    = 0.01,
-
-            // floating point comparison
-            fp_equals     = function (a, b) { return Math.abs(a - b) <= fp_epsilon; },
-            fp_greater    = function (a, b) { return a - b >= fp_epsilon; },
-            fp_lesser     = function (a, b) { return a - b <= fp_epsilon; },
 
             // some current values used to cache .getComputedStyle() accesses and compare to our goals
             lineHeight, targetHeight, currentHeight, lastKnownGood;
@@ -189,6 +214,39 @@ YUI.add('ellipsis', function (Y) {
     Y.Node.importMethod(Y.DOM, 'ellipsis');
     Y.NodeList.importMethod(Y.Node.prototype, 'ellipsis');
 
+    // must wait to append hidden node
+    Y.on('domready', function () {
+
+        // create a hidden node and try to style it
+        var cloned,
+            hidden  = Y.Node.create('<div style="visibility:hidden;position:absolute;white-space:nowrap;overflow:hidden;"></div>'),
+            rules   = ['textOverflow', 'OTextOverflow'];
+
+        Y.each(rules, function (rule) {
+            hidden.setStyle(rule, 'ellipsis');
+        });
+
+        // add to DOM
+        Y.one('body').appendChild(hidden);
+
+        // deep clone the node (include attributes)
+        cloned = hidden.cloneNode(true);
+
+        Y.some(rules, function (rule) {
+            if ('ellipsis' === cloned.getStyle(rule)) {
+                nativeRule = rule;
+                return true;
+            }
+        });
+
+        // notify of results (you'd do something cooler than this, like add it as a property to your feature testing object)
+        Y.DOM.ellipsis.nativeSupport = !!nativeRule;
+
+        // clean-up
+        hidden.remove();
+        hidden = cloned = null;
+
+    });
 
 },
 

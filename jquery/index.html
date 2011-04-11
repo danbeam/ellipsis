@@ -13,17 +13,18 @@
         <h1>Ellipsis plugin (jQuery) - for when there's just too much t ...</h1>
         <div class="single">
             <h2>Single line (<a href="#">do it!</a>)</h2>
-            <span>Hello world!</span>
+            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
+        </div>
+        <div class="native">
+            <h2>Native support (<a href="#">do it!</a>)</h2>
             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
         <div class="multiple">
             <h2>Multiple line (<a href="#">do it!</a>)</h2>
-            <span>Hello world!</span>
             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
         <div class="resizable">
             <h2>Resize with window</h2>
-            <span>Hello world!</span>
             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
         <div>
@@ -36,16 +37,32 @@
 
             $(function () {
                 $('.single a').click(function (e) {
-                    $(this).parent().siblings().ellipsis();
+                    $(this).parent().siblings().ellipsis({'native':false});
                     e.preventDefault();
                 });
+                if ($.fn.ellipsis.nativeSupport) {
+                    $('.native a').click(function (e) {
+                        $(this).parent().siblings().ellipsis();
+                        e.preventDefault();
+                    });
+                }
+                else {
+                    $('.native h2').text('Native support').css('text-decoration', 'line-through');
+                    $('.native span').text('Native support isn\'t available in your browser, :(');
+                }
                 $('.multiple a').click(function (e) {
-                    $(this).parent().siblings().ellipsis({lines:3});
+                    $(this).parent().siblings().ellipsis({'lines':3});
                     e.preventDefault();
                 });
-                $(window).resize(function () {
+                if ($.fn.ellipsis.nativeSupport) {
                     $('.resizable span').ellipsis();
-                });
+                }
+                else {
+                    $('.resizable span').ellipsis({'native':false});
+                    $(window).resize(function () {
+                        $('.resizable span').ellipsis({'native':false});
+                    });
+                }
             });
 
         //]]></script>

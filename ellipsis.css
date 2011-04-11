@@ -25,7 +25,7 @@ span {
     font-size: 90%;
 }
 
-.single span, .multiple span, .resizable span {
+.single span, .native span, .multiple span, .resizable span {
     font-family: 'Calligraffitti';
 }
 

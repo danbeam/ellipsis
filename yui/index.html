@@ -13,17 +13,18 @@
         <h1>Ellipsis plugin (YUI3) - for when there's just too much t ...</h1>
         <div class="single">
             <h2>Single line (<a href="#">do it!</a>)</h2>
-            <span>Hello world!</span>
+            <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
+        </div>
+        <div class="native">
+            <h2>Native support (<a href="#">do it!</a>)</h2>
             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
         <div class="multiple">
             <h2>Multiple line (<a href="#">do it!</a>)</h2>
-            <span>Hello world!</span>
             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
         <div class="resizable">
             <h2>Resize with window</h2>
-            <span>Hello world!</span>
             <span>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer nec libero nisi, vulputate hendrerit odio. Nulla at justo turpis. Suspendisse potenti. Curabitur aliquet tempus nibh, at pellentesque nunc scelerisque ac. Vivamus suscipit, leo quis ornare molestie, est lacus sodales nunc, ac tincidunt odio sapien nec nibh. Proin dolor nisl, pretium nec feugiat vel, rhoncus a massa. Duis vulputate sagittis risus non sollicitudin. Cras cursus odio quis nibh sollicitudin et fringilla magna auctor. Suspendisse nec orci diam. Quisque eu urna massa, eget sollicitudin augue.</span>
         </div>
         <div>
@@ -39,17 +40,35 @@
                         'fullpath' : 'yui.ellipsis.min.js'
                     }
                 }
-            }).use('node', 'event', 'windowresize', 'ellipsis', function (Y) {
-                Y.all('.single a').on('click', function (e) {
-                    e.target.get('parentNode').siblings().ellipsis();
-                    e.preventDefault();
-                });
-                Y.all('.multiple a').on('click', function (e) {
-                    e.target.get('parentNode').siblings().ellipsis({lines:3});
-                    e.preventDefault();
-                });
-                Y.on('windowresize', function () {
-                    Y.all('.resizable span').ellipsis();
+            }).use('node', 'event', 'ellipsis', function (Y) {
+                Y.on('domready', function () {
+                    Y.all('.single a').on('click', function (e) {
+                        e.target.get('parentNode').siblings().ellipsis({'native':false});
+                        e.preventDefault();
+                    });
+                    if (Y.DOM.ellipsis.nativeSupport) {
+                        Y.all('.native a').on('click', function (e) {
+                            e.target.get('parentNode').siblings().ellipsis();
+                            e.preventDefault();
+                        });
+                    }
+                    else {
+                        Y.one('.native h2').set('text', 'Native support').setStyle('textDecoration', 'line-through');
+                        Y.all('.native span').set('text', 'Native support isn\'t available in your browser, :(');
+                    }
+                    Y.all('.multiple a').on('click', function (e) {
+                        e.target.get('parentNode').siblings().ellipsis({'lines':3});
+                        e.preventDefault();
+                    });
+                    if (Y.DOM.ellipsis.nativeSupport) {
+                        Y.all('.resizable span').ellipsis();
+                    }
+                    else {
+                        Y.all('.resizable span').ellipsis({'native':false});
+                        Y.on('windowresize', function () {
+                            Y.all('.resizable span').ellipsis({'native':false});
+                        });
+                    }
                 });
             });
 
