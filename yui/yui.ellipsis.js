@@ -29,7 +29,13 @@ YUI.add('ellipsis', function (Y) {
         fp_lesser   = function (a, b) { return a - b <= fp_epsilon; },
 
         // do a quick feature test to see if native text-overflow: ellipsis is supported
-        nativeRule  = false;
+        nativeRule  = false,
+
+        // remember some native styles if we have support
+        nativeStyles = {
+            'white-space'   : 'nowrap',
+            'overflow'      : 'hidden'
+        };
 
     // add this on all Y.Node instances (but only if imported
     Y.DOM.ellipsis = function (node, conf) {
@@ -59,25 +65,6 @@ YUI.add('ellipsis', function (Y) {
         // console.log(Y.one(node).getComputedStyle('lineHeight'));
         // console.log(Y.one(node).getComputedStyle('fontSize'));
 
-        // if we have the native support for text-overflow and we only want 1 line with the same style ellipsis
-        if (Y.DOM.ellipsis.nativeSupport && conf['native'] && 1 == conf.lines && '\u2026' === conf.ellipsis) {
-
-            // just use the native by setting this CSS
-            var nativeStyles = {
-                'white-space'   : 'nowrap',
-                'overflow'      : 'hidden'
-            };
-
-            // set the native rule as well
-            nativeStyles[nativeRule] = 'ellipsis';
-
-            // apply the styles
-            Y.one(node).setStyles(nativeStyles);
-
-            return; // exit early
-
-        }
-
             // the element we're trying to truncate
         var yEl           = Y.one(node),
 
@@ -98,6 +85,7 @@ YUI.add('ellipsis', function (Y) {
 
             // some current values used to cache .getComputedStyle() accesses and compare to our goals
             lineHeight, targetHeight, currentHeight, lastKnownGood;
+
 
         // @@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
         // @ NOTE: I'm intentionally ignoring padding as .getComputedStyle('height') @
@@ -128,6 +116,16 @@ YUI.add('ellipsis', function (Y) {
 
         // get the height of the node with only 1 character of text (should be 1 line)
         lineHeight    = parseFloat(clone.getComputedStyle('height'), 10);
+
+        // if we have the native support for text-overflow and we only want 1 line with the same style ellipsis
+        if (Y.DOM.ellipsis.nativeSupport && conf['native'] && 1 == conf.lines && '\u2026' === conf.ellipsis) {
+            // apply the styles
+            yEl.setStyles(nativeStyles);
+            yEl.setStyle('height', lineHeight + 'px');
+            // exit early and clean-up
+            clone.remove();
+            return;
+        }
 
         // set overflow back to visible
         clone.setStyle('overflow', 'visible');
@@ -235,12 +233,11 @@ YUI.add('ellipsis', function (Y) {
         Y.some(rules, function (rule) {
             if ('ellipsis' === cloned.getStyle(rule)) {
                 nativeRule = rule;
+                nativeStyles[nativeRule] = 'ellipsis';
+                Y.DOM.ellipsis.nativeSupport = true;
                 return true;
             }
         });
-
-        // notify of results (you'd do something cooler than this, like add it as a property to your feature testing object)
-        Y.DOM.ellipsis.nativeSupport = !!nativeRule;
 
         // clean-up
         hidden.remove();
