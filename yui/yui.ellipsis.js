@@ -35,7 +35,10 @@ YUI.add('ellipsis', function (Y) {
         nativeStyles = {
             'white-space'   : 'nowrap',
             'overflow'      : 'hidden'
-        };
+        },
+
+        // determine whether we want to use currentStyle instead of some buggy .getComputedStyle() results
+        currentStyle = false;
 
     // add this on all Y.Node instances (but only if imported
     Y.DOM.ellipsis = function (node, conf) {
@@ -99,9 +102,9 @@ YUI.add('ellipsis', function (Y) {
             'visibility'    : 'hidden',
             'display'       : 'block',
             'bottom'        : '-10px',
-            'right'         : '-10px',
-            'width'         : yEl.getComputedStyle('width'),
-            'fontSize'      : yEl.getComputedStyle('fontSize'),
+            'left'          : '-10px',
+            'width'         : currentStyle ? node.offsetWidth           : yEl.getComputedStyle('width'),
+            'fontSize'      : currentStyle ? node.currentStyle.fontSize : yEl.getComputedStyle('fontSize'), /* weird IE7 + reset bug */
             'fontFamily'    : yEl.getComputedStyle('fontFamily'),
             'fontWeight'    : yEl.getComputedStyle('fontWeight'),
             'letterSpacing' : yEl.getComputedStyle('letterSpacing'),
@@ -115,12 +118,14 @@ YUI.add('ellipsis', function (Y) {
         Y.one('body').append(clone);
 
         // get the height of the node with only 1 character of text (should be 1 line)
-        lineHeight    = parseFloat(clone.getComputedStyle('height'), 10);
+        lineHeight    = parseFloat(clone.getComputedStyle('height'));
 
         // if we have the native support for text-overflow and we only want 1 line with the same style ellipsis
         if (Y.DOM.ellipsis.nativeSupport && conf['native'] && 1 == conf.lines && '\u2026' === conf.ellipsis) {
+            // console.log('using native!');
             // apply the styles
             yEl.setStyles(nativeStyles);
+            // this is needed to trigger the overflow in some browser (*cough* Opera *cough*)
             yEl.setStyle('height', lineHeight + 'px');
             // exit early and clean-up
             clone.remove();
@@ -137,7 +142,7 @@ YUI.add('ellipsis', function (Y) {
         clone.set('text', originalText);
 
         // ok, now that we have a node in the DOM with the right text, measure it's height
-        currentHeight = parseFloat(clone.getComputedStyle('height'), 10);
+        currentHeight = parseFloat(clone.getComputedStyle('height'));
 
         // console.log('lineHeight', lineHeight);
         // console.log('currentHeight', currentHeight);
@@ -165,7 +170,7 @@ YUI.add('ellipsis', function (Y) {
             clone.set('text', originalText.slice(0, currentLength - conf.ellipsis.length) + conf.ellipsis);
             
             // compute the current height
-            currentHeight = parseFloat(clone.getComputedStyle('height'), 10);
+            currentHeight = parseFloat(clone.getComputedStyle('height'));
 
             // we only want to store values that aren't too big
             if (fp_equals(currentHeight, targetHeight) || fp_lesser(currentHeight, targetHeight)) {
@@ -219,6 +224,9 @@ YUI.add('ellipsis', function (Y) {
         var cloned,
             hidden  = Y.Node.create('<div style="visibility:hidden;position:absolute;white-space:nowrap;overflow:hidden;"></div>'),
             rules   = ['textOverflow', 'OTextOverflow'];
+
+        // pseudo feature detection to detect browsers with currentStyle but without a more standards-ish implementation (currently IE6-8)
+        currentStyle = !!(document.body.currentStyle && (window.CSSCurrentStyleDeclaration || !window.CSSStyleDeclaration));
 
         Y.each(rules, function (rule) {
             hidden.setStyle(rule, 'ellipsis');

@@ -3,6 +3,10 @@ body {
     font-size: 20px;
 }
 
+* {
+    zoom: 1; /* stupid IEs and their zoom */
+}
+
 h1, h2, a, span { 
     font-family: helvetica, "trebuchet ms", arial, verdana, sans-serif;
 }

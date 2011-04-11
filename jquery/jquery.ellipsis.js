@@ -33,7 +33,7 @@
 
         // this is populated later if native support is available
         nativeRule  = false,
-    
+
         // if these styles are already set, resetting them isn't that big of a deal (performance wise)
         nativeStyles = {
             'white-space'       : 'nowrap',
@@ -104,7 +104,7 @@
                 'fontSize'      : $el.css('font-size'),
                 'fontFamily'    : $el.css('font-family'),
                 'fontWeight'    : $el.css('font-weight'),
-                'letterSpacing' : $el.css('letter-spacing'),
+                'letterSpacing' : $el.css('letter-spacing')
             });
 
             // insert some sample text to get the line-height
@@ -204,6 +204,9 @@
 
     };
 
+    // innocent until proven guilty
+    $.extend({'ellipsis':{'nativeSupport' : false}});
+
     // do a quick feature test to see if we're natively supported
     $(function () {
 
@@ -211,7 +214,7 @@
         var hidden      = $('<div style="visibility:hidden;position:absolute;white-space:nowrap;overflow:hidden;"></div>'),
 
             // give any possible rules that would give native support (omit -ms-text-overflow - does the same thing)
-            nativeRules = ['textOverflow', 'OTextOverflow'];
+            nativeRules = ['text-overflow', '-o-text-overflow'];
 
         // add each of the prospective native rules
         $(nativeRules).each(function (i, rule) {
@@ -229,7 +232,7 @@
             if ('ellipsis' === $(cloned).css(rule)) {
                 nativeRule = rule;
                 nativeStyles[nativeRule] = 'ellipsis';
-                $.fn.ellipsis.nativeSupport = true;
+                $.ellipsis.nativeSupport = true;
                 return false;
             }
         });
