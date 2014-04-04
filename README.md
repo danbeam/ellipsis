@@ -3,10 +3,17 @@ Ellipsis
 
 Ellipsis is a set of JavaScript plugins I created to emulate `text-overflow: ellipsis;` before it was implemented in [modern browsers](https://developer.mozilla.org/en-US/docs/Web/CSS/text-overflow).
 
+## Why would I use this now? ##
+
 The benefits that this library still offers over simply using CSS (as of 4/4/2014) are:
 * uses native (`text-overflow: ellipsis;`) support when possible
 * offers a fallback if native support isn't available
 * supports multi-line overflow handling (e.g. 3 lines then …)
+
+## Demos ##
+
+http://danbeam.org/ellipsis/jquery (jQuery)<br>
+http://danbeam.org/ellipsis/yui (YUI)
 
 ## Configuration ##
 
